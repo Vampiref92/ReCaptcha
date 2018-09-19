@@ -71,7 +71,7 @@ class ReCaptcha implements ReCaptchaInterface
      */
     public static function addJs($mode = self::INIT_RECAPTCHA_BY_HTML, $callback = self::CALLBACK)
     {
-        Asset::getInstance()->addJs('https://www.google.com/recaptcha/api.js?hl=ru&onload=' . $callback . 'k&render=' . $mode);
+        Asset::getInstance()->addJs('https://www.google.com/recaptcha/api.js?hl=ru&onload=' . $callback . '&render=' . $mode);
     }
 
     /**
