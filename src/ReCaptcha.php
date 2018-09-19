@@ -16,14 +16,15 @@ use Vf92\ReCaptcha\Exception\NotFountSecretKey;
  */
 class ReCaptcha implements ReCaptchaInterface
 {
+    const CALLBACK = 'onLoadReCaptchaCallback';
+    const SERVICE_URI = 'https://www.google.com/recaptcha/api/siteverify';
+    const INIT_RECAPTCHA_BY_JS = 'explicit';
+    const INIT_RECAPTCHA_BY_HTML = 'onload';
     /**
      * @var ClientInterface
      */
     protected $guzzle;
-
     protected $parameters;
-
-    protected static $serviceUri = 'https://www.google.com/recaptcha/api/siteverify';
 
     /**
      * ReCaptchaService constructor.
@@ -40,29 +41,9 @@ class ReCaptcha implements ReCaptchaInterface
             throw new NotFountSecretKey('Не установлен ключ(key) или секретный ключ(secretKey)');
         }
         if (!isset($parameters['serviceUrl'])) {
-            $parameters['serviceUrl'] = static::$serviceUri;
+            $parameters['serviceUrl'] = static::SERVICE_URI;
         }
         $this->parameters = $parameters;
-    }
-
-    /**
-     * @param string $additionalClass
-     *
-     * @param bool   $isAjax
-     *
-     * @return string
-     */
-    public function getCaptcha($additionalClass = '', $isAjax = false)
-    {
-        if (!$isAjax) {
-            $script = '';
-            static::addJs();
-        } else {
-            $script = static::getJs();
-        }
-
-        return $script . '<div class="g-recaptcha' . $additionalClass . '" data-sitekey="' . $this->parameters['key']
-            . '"></div>';
     }
 
     /**
@@ -85,46 +66,32 @@ class ReCaptcha implements ReCaptchaInterface
     }
 
     /**
-     * @return array
+     * @param string $mode
+     * @param string $callback
      */
-    public function getParams()
+    public static function addJs($mode = self::INIT_RECAPTCHA_BY_HTML, $callback = self::CALLBACK)
     {
-        return ['sitekey' => $this->parameters['key']];
+        Asset::getInstance()->addJs('https://www.google.com/recaptcha/api.js?hl=ru&onload=' . $callback . 'k&render=' . $mode);
     }
 
     /**
+     * @param string $mode
+     */
+    public static function addJsAsync($mode = self::INIT_RECAPTCHA_BY_HTML)
+    {
+        Asset::getInstance()->addString(static::getJs($mode), true, AssetLocation::AFTER_JS);
+    }
+
+    /**
+     * @param string $mode
      *
-     */
-    public static function addJs()
-    {
-        Asset::getInstance()->addJs('https://www.google.com/recaptcha/api.js?hl=ru');
-    }
-
-    /**
+     * @param string $callback
      *
-     */
-    public static function addJsAsync()
-    {
-        Asset::getInstance()->addString(static::getJs(), true, AssetLocation::AFTER_JS_KERNEL);
-    }
-
-    /**
      * @return string
      */
-    public static function getJs()
+    public static function getJs($mode = self::INIT_RECAPTCHA_BY_HTML, $callback = self::CALLBACK)
     {
-        return '<script data-skip-moving=true async src="https://www.google.com/recaptcha/api.js?hl=ru"></script>';
-    }
-
-    /**
-     * @param string $recaptcha
-     *
-     * @return bool
-     */
-    public function check($recaptcha = '')
-    {
-        return static::baseCheck($recaptcha, $this->parameters['secretKey'], $this->parameters['serviceUri'],
-            $this->guzzle);
+        return '<script async defer src="https://www.google.com/recaptcha/api.js?hl=ru&onload=' . $callback . '&render=' . $mode . '"></script>';
     }
 
     /**
@@ -135,13 +102,17 @@ class ReCaptcha implements ReCaptchaInterface
      *
      * @return bool
      */
-    public static function checkCaptcha($secretKey, $recaptcha = '', $serviceUri = '', ClientInterface $client = null)
-    {
+    public static function checkCaptcha(
+        $secretKey,
+        $recaptcha = '',
+        $serviceUri = self::SERVICE_URI,
+        ClientInterface $client = null
+    ) {
         if ($client === null) {
             $client = new Client();
         }
         if (empty($serviceUri)) {
-            $serviceUri = static::$serviceUri;
+            $serviceUri = static::SERVICE_URI;
         }
         return static::baseCheck($recaptcha, $secretKey, $serviceUri, $client);
     }
@@ -187,5 +158,44 @@ class ReCaptcha implements ReCaptchaInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param string $additionalClass
+     *
+     * @param bool   $isAjax
+     *
+     * @return string
+     */
+    public function getCaptcha($additionalClass = '', $isAjax = false)
+    {
+        if (!$isAjax) {
+            $script = '';
+            static::addJs();
+        } else {
+            $script = static::getJs();
+        }
+
+        return $script . '<div class="g-recaptcha' . $additionalClass . '" data-sitekey="' . $this->parameters['key']
+            . '"></div>';
+    }
+
+    /**
+     * @return array
+     */
+    public function getParams()
+    {
+        return ['sitekey' => $this->parameters['key']];
+    }
+
+    /**
+     * @param string $recaptcha
+     *
+     * @return bool
+     */
+    public function check($recaptcha = '')
+    {
+        return static::baseCheck($recaptcha, $this->parameters['secretKey'], $this->parameters['serviceUri'],
+            $this->guzzle);
     }
 }
