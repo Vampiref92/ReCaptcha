@@ -3,6 +3,7 @@
 use Bitrix\Main\Application;
 use Bitrix\Main\Page\Asset;
 use Bitrix\Main\Page\AssetLocation;
+use Bitrix\Main\SystemException;
 use Bitrix\Main\Web\Uri;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -155,7 +156,11 @@ class ReCaptcha implements ReCaptchaInterface
      */
     protected static function baseCheck($recaptcha, $secretKey, $serviceUri, ClientInterface $client)
     {
-        $context = Application::getInstance()->getContext();
+        try {
+            $context = Application::getInstance()->getContext();
+        } catch (SystemException $e) {
+            return false;
+        }
         if (empty($recaptcha)) {
             $recaptcha = (string)$context->getRequest()->get('g-recaptcha-response');
         }
