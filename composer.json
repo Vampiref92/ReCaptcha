@@ -1,0 +1,29 @@
+{
+  "name": "vf92/recaptcha-bitrix",
+  "description": "google recaptcha bitrix",
+  "homepage": "https://github.com/Vampiref92/Recaptcha",
+  "type": "library",
+  "license": "proprietary",
+  "keywords": [
+    "bitrix",
+    "recaptcha",
+    "google"
+  ],
+  "authors": [
+    {
+      "name": "Frolov Sergey",
+      "email": "vampiref92@yandex.ru"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Vf92\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=5.6",
+    "vf92/bitrix-base": "^1.0",
+    "guzzlehttp/guzzle": "^6.3"
+  },
+  "minimum-stability": "stable"
+}
