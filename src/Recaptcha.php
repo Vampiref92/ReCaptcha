@@ -3,7 +3,6 @@
 use Bitrix\Main\Application;
 use Bitrix\Main\Page\Asset;
 use Bitrix\Main\Page\AssetLocation;
-use Bitrix\Main\SystemException;
 use Bitrix\Main\Web\Uri;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -17,18 +16,13 @@ class ReCaptcha implements ReCaptchaInterface
      */
     protected $guzzle;
 
-    private $parameters;
-
-    /** @noinspection SpellCheckingInspection */
+    protected $parameters;
 
     /**
      * ReCaptchaService constructor.
      *
-     * @param ClientInterface $client
-     *
      * @param array           $parameters
      *
-     * @throws \RuntimeException
      * @throws NotFountSecretKey
      */
     public function __construct(array $parameters)
@@ -93,13 +87,10 @@ class ReCaptcha implements ReCaptchaInterface
     /**
      * @param string $recaptcha
      *
-     * @throws \RuntimeException
-     * @throws SystemException
      * @return bool
      */
     public function checkCaptcha($recaptcha = '')
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $context = Application::getInstance()->getContext();
         if (empty($recaptcha)) {
             $recaptcha = (string)$context->getRequest()->get('g-recaptcha-response');
