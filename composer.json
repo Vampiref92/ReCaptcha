@@ -17,7 +17,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Vf92\\Recaptcha\\": "src/"
+      "Vf92\\ReCaptcha\\": "src/"
     }
   },
   "require": {
