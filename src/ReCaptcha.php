@@ -1,4 +1,4 @@
-<?php namespace Vf92\Recaptcha;
+<?php namespace Vf92\ReCaptcha;
 
 use Bitrix\Main\Application;
 use Bitrix\Main\Page\Asset;
@@ -8,11 +8,11 @@ use Bitrix\Main\Web\Uri;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Vf92\Recaptcha\Exception\NotFountSecretKey;
+use Vf92\ReCaptcha\Exception\NotFountSecretKey;
 
 /**
  * Class ReCaptcha
- * @package Vf92\Recaptcha
+ * @package Vf92\ReCaptcha
  */
 class ReCaptcha implements ReCaptchaInterface
 {

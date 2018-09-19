@@ -6,10 +6,11 @@
  * Time: 11:46
  */
 
-namespace Vf92\Recaptcha;
+namespace Vf92\ReCaptcha;
 
 use Bitrix\Main\SystemException;
 use GuzzleHttp\ClientInterface;
+use Vf92\ReCaptcha\Exception\NotFountSecretKey;
 
 interface ReCaptchaInterface
 {
