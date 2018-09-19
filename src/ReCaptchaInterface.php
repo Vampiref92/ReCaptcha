@@ -9,9 +9,19 @@
 namespace Vf92\Recaptcha;
 
 use Bitrix\Main\SystemException;
+use GuzzleHttp\ClientInterface;
 
 interface ReCaptchaInterface
 {
+    /**
+     * ReCaptchaService constructor.
+     *
+     * @param array $parameters
+     *
+     * @throws NotFountSecretKey
+     */
+    public function __construct(array $parameters);
+
     /**
      * @param string $additionalClass
      *
@@ -26,14 +36,23 @@ interface ReCaptchaInterface
      */
     public function getParams();
 
-    public function addJs();
+    public static function addJs();
 
-    public function addJsAsync();
+    public static function addJsAsync();
+
+    /**
+     * @param string $key
+     * @param string $additionalClass
+     * @param bool   $isAjax
+     *
+     * @return string
+     */
+    public static function getCaptchaStatic($key, $additionalClass = '', $isAjax = false);
 
     /**
      * @return string
      */
-    public function getJs();
+    public static function getJs();
 
     /**
      * @param string $recaptcha
@@ -42,5 +61,15 @@ interface ReCaptchaInterface
      * @throws SystemException
      * @return bool
      */
-    public function checkCaptcha($recaptcha = '');
+    public function check($recaptcha = '');
+
+    /**
+     * @param string          $recaptcha
+     * @param string          $secretKey
+     * @param string          $serviceUri
+     * @param ClientInterface $client
+     *
+     * @return bool
+     */
+    public static function checkCaptcha($secretKey, $recaptcha = '', $serviceUri = '', ClientInterface $client = null);
 }

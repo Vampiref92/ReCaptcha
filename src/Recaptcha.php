@@ -9,6 +9,10 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Vf92\Recaptcha\Exception\NotFountSecretKey;
 
+/**
+ * Class ReCaptcha
+ * @package Vf92\Recaptcha
+ */
 class ReCaptcha implements ReCaptchaInterface
 {
     /**
@@ -18,10 +22,12 @@ class ReCaptcha implements ReCaptchaInterface
 
     protected $parameters;
 
+    protected static $serviceUri = 'https://www.google.com/recaptcha/api/siteverify';
+
     /**
      * ReCaptchaService constructor.
      *
-     * @param array           $parameters
+     * @param array $parameters
      *
      * @throws NotFountSecretKey
      */
@@ -33,7 +39,7 @@ class ReCaptcha implements ReCaptchaInterface
             throw new NotFountSecretKey('Не установлен ключ(key) или секретный ключ(secretKey)');
         }
         if (!isset($parameters['serviceUrl'])) {
-            $parameters['serviceUrl'] = 'https://www.google.com/recaptcha/api/siteverify';
+            $parameters['serviceUrl'] = static::$serviceUri;
         }
         $this->parameters = $parameters;
     }
@@ -49,13 +55,32 @@ class ReCaptcha implements ReCaptchaInterface
     {
         if (!$isAjax) {
             $script = '';
-            $this->addJs();
+            static::addJs();
         } else {
-            $script = $this->getJs();
+            $script = static::getJs();
         }
 
         return $script . '<div class="g-recaptcha' . $additionalClass . '" data-sitekey="' . $this->parameters['key']
             . '"></div>';
+    }
+
+    /**
+     * @param string $key
+     * @param string $additionalClass
+     * @param bool   $isAjax
+     *
+     * @return string
+     */
+    public static function getCaptchaStatic($key, $additionalClass = '', $isAjax = false)
+    {
+        if (!$isAjax) {
+            $script = '';
+            static::addJs();
+        } else {
+            $script = static::getJs();
+        }
+
+        return $script . '<div class="g-recaptcha' . $additionalClass . '" data-sitekey="' . $key . '"></div>';
     }
 
     /**
@@ -66,20 +91,26 @@ class ReCaptcha implements ReCaptchaInterface
         return ['sitekey' => $this->parameters['key']];
     }
 
-    public function addJs()
+    /**
+     *
+     */
+    public static function addJs()
     {
         Asset::getInstance()->addJs('https://www.google.com/recaptcha/api.js?hl=ru');
     }
 
-    public function addJsAsync()
+    /**
+     *
+     */
+    public static function addJsAsync()
     {
-        Asset::getInstance()->addString($this->getJs(), true, AssetLocation::AFTER_JS_KERNEL);
+        Asset::getInstance()->addString(static::getJs(), true, AssetLocation::AFTER_JS_KERNEL);
     }
 
     /**
      * @return string
      */
-    public function getJs()
+    public static function getJs()
     {
         return '<script data-skip-moving=true async src="https://www.google.com/recaptcha/api.js?hl=ru"></script>';
     }
@@ -89,28 +120,61 @@ class ReCaptcha implements ReCaptchaInterface
      *
      * @return bool
      */
-    public function checkCaptcha($recaptcha = '')
+    public function check($recaptcha = '')
+    {
+        return static::baseCheck($recaptcha, $this->parameters['secretKey'], $this->parameters['serviceUri'],
+            $this->guzzle);
+    }
+
+    /**
+     * @param string          $recaptcha
+     * @param string          $secretKey
+     * @param string          $serviceUri
+     * @param ClientInterface $client
+     *
+     * @return bool
+     */
+    public static function checkCaptcha($secretKey, $recaptcha = '', $serviceUri = '', ClientInterface $client = null)
+    {
+        if ($client === null) {
+            $client = new Client();
+        }
+        if (empty($serviceUri)) {
+            $serviceUri = static::$serviceUri;
+        }
+        return static::baseCheck($recaptcha, $secretKey, $serviceUri, $client);
+    }
+
+    /**
+     * @param                 $recaptcha
+     * @param                 $secretKey
+     * @param                 $serviceUri
+     * @param ClientInterface $client
+     *
+     * @return bool
+     */
+    protected static function baseCheck($recaptcha, $secretKey, $serviceUri, ClientInterface $client)
     {
         $context = Application::getInstance()->getContext();
         if (empty($recaptcha)) {
             $recaptcha = (string)$context->getRequest()->get('g-recaptcha-response');
         }
-        $uri = new Uri($this->parameters['serviceUri']);
+        $uri = new Uri($serviceUri);
         $uri->addParams(
             [
-                'secret'   => $this->parameters['secretKey'],
+                'secret'   => $secretKey,
                 'response' => $recaptcha,
                 'remoteip' => $context->getServer()->get('REMOTE_ADDR'),
             ]
         );
         if (!empty($recaptcha)) {
             try {
-                $res = $this->guzzle->request('get', $uri->getUri());
+                $res = $client->request('get', $uri->getUri());
             } catch (GuzzleException $e) {
                 return false;
             }
             if ($res->getStatusCode() === 200) {
-                $data = json_decode($res->getBody()->getContents());
+                $data = \json_decode($res->getBody()->getContents());
                 if ($data && $data->success) {
                     return true;
                 }
