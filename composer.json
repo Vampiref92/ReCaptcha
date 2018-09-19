@@ -17,12 +17,11 @@
   ],
   "autoload": {
     "psr-4": {
-      "Vf92\\": "src/"
+      "Vf92\\Recaptcha\\": "src/"
     }
   },
   "require": {
     "php": ">=5.6",
-    "vf92/bitrix-base": "^1.0",
     "guzzlehttp/guzzle": "^6.3"
   },
   "minimum-stability": "stable"

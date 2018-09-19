@@ -1,4 +1,5 @@
-<?php namespace Vf92\Form\Exception;
+<?php namespace Vf92\Recaptcha\Exception;
+
 class NotFountSecretKey extends \Exception
 {
 

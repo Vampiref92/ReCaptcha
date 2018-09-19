@@ -1,4 +1,4 @@
-<?php namespace Vf92;
+<?php namespace Vf92\Recaptcha;
 
 use Bitrix\Main\Application;
 use Bitrix\Main\Page\Asset;
@@ -8,14 +8,10 @@ use Bitrix\Main\Web\Uri;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
-use Psr\Log\LoggerAwareInterface;
-use Vf92\Form\Exception\NotFountSecretKey;
-use Vf92\Log\LazyLoggerAwareTrait;
+use Vf92\Recaptcha\Exception\NotFountSecretKey;
 
-class ReCaptcha implements LoggerAwareInterface, ReCaptchaInterface
+class ReCaptcha implements ReCaptchaInterface
 {
-    use LazyLoggerAwareTrait;
-
     /**
      * @var ClientInterface
      */

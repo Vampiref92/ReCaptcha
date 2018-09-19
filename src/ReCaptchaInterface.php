@@ -6,7 +6,7 @@
  * Time: 11:46
  */
 
-namespace Vf92;
+namespace Vf92\Recaptcha;
 
 use Bitrix\Main\SystemException;
 
