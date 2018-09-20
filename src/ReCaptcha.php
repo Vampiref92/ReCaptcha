@@ -47,6 +47,18 @@ class ReCaptcha implements ReCaptchaInterface
     }
 
     /**
+     * ReCaptchaService constructor.
+     *
+     * @param array $parameters
+     *
+     * @throws NotFountSecretKey
+     */
+    public static function getInstance(array $parameters)
+    {
+        return new static($parameters);
+    }
+
+    /**
      * @param string $key
      * @param string $additionalClass
      * @param bool   $isAjax
@@ -102,19 +114,13 @@ class ReCaptcha implements ReCaptchaInterface
      *
      * @return bool
      */
-    public static function checkCaptcha(
-        $secretKey,
-        $recaptcha = '',
-        $serviceUri = self::SERVICE_URI,
-        ClientInterface $client = null
-    ) {
-        if ($client === null) {
-            $client = new Client();
-        }
+    public static function checkCaptcha($secretKey, $recaptcha = '', $serviceUri = self::SERVICE_URI)
+    {
         if (empty($serviceUri)) {
             $serviceUri = static::SERVICE_URI;
         }
-        return static::baseCheck($recaptcha, $secretKey, $serviceUri, $client);
+
+        return static::baseCheck($recaptcha, $secretKey, $serviceUri, new Client());
     }
 
     /**
@@ -176,16 +182,8 @@ class ReCaptcha implements ReCaptchaInterface
             $script = static::getJs();
         }
 
-        return $script . '<div class="g-recaptcha' . $additionalClass . '" data-sitekey="' . $this->parameters['key']
+        return $script . '<div class="g-recaptcha' . $additionalClass . '" data-sitekey="' . $this->getKey()
             . '"></div>';
-    }
-
-    /**
-     * @return array
-     */
-    public function getParams()
-    {
-        return ['sitekey' => $this->parameters['key']];
     }
 
     /**
@@ -195,7 +193,31 @@ class ReCaptcha implements ReCaptchaInterface
      */
     public function check($recaptcha = '')
     {
-        return static::baseCheck($recaptcha, $this->parameters['secretKey'], $this->parameters['serviceUri'],
+        return static::baseCheck($recaptcha, $this->getSecretKey(), $this->getServiceUri(),
             $this->guzzle);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getServiceUri()
+    {
+        return (string)$this->parameters['serviceUri'];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSecretKey()
+    {
+        return (string)$this->parameters['secretKey'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getKey()
+    {
+        return (string)$this->parameters['key'];
     }
 }
