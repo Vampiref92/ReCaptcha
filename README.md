@@ -1,4 +1,21 @@
-## ReCaptcha для Битиркс
+## Установка через composer
+```
+composer install vf92/recaptcha-bitrix
+```
+или добавляем в composer.json
+```
+{
+...
+"require": {
+    ...
+    "vf92/recaptcha-bitrix": "^1.3.5",
+    ...
+    }
+    ...
+}
+```
+
+## ReCaptcha для Битрикс
 
 ### Использование
 ```php
