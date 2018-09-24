@@ -1,4 +1,6 @@
-## Установка через composer
+## ReCaptcha для Битрикс
+
+### Установка через composer
 ```
 composer install vf92/recaptcha-bitrix
 ```
@@ -14,8 +16,6 @@ composer install vf92/recaptcha-bitrix
     ...
 }
 ```
-
-## ReCaptcha для Битрикс
 
 ### Использование
 ```php
