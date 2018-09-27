@@ -5,15 +5,11 @@
 composer install vf92/recaptcha-bitrix
 ```
 или добавляем в composer.json
-```
+```js
 {
-...
-"require": {
-    ...
-    "vf92/recaptcha-bitrix": "^1.3.5",
-    ...
+    "require": {
+        "vf92/recaptcha-bitrix": "^1.3.5"
     }
-    ...
 }
 ```
 
